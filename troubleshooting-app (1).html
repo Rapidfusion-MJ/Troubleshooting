@@ -1,0 +1,1448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rapid Fusion PE320 Troubleshooting Guide</title>
+    <style>
+        :root {
+            --primary-color: #a74e9e;
+            --secondary-color: #933c85;
+            --bg-dark: #1a1a1a;
+            --bg-darker: #141414;
+            --bg-card: rgba(43, 43, 43, 0.95);
+            --text-light: #e6e6e6;
+            --text-dim: #a0a0a0;
+            --border-radius: 8px;
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+            --gradient-primary: linear-gradient(135deg, #a74e9e, #834D83);
+            --transition-speed: 0.2s;
+            --success-color: #2e7d32;
+            --warning-color: #e6a23c;
+            --error-color: #a72530;
+        }
+
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            background: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 100% 0%, rgba(167, 78, 158, 0.12) 0%, transparent 40%),
+                radial-gradient(circle at 0% 100%, rgba(131, 77, 131, 0.12) 0%, transparent 40%);
+            color: var(--text-light);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            padding: 30px 0;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin: 0;
+            font-size: 2.5rem;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            color: var(--text-dim);
+            font-size: 1.2rem;
+            margin-top: 10px;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(167, 78, 158, 0.2);
+            padding: 30px;
+            margin-bottom: 30px;
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+        }
+
+        .decision-tree {
+            margin-top: 20px;
+        }
+
+        .question {
+            margin-bottom: 20px;
+            opacity: 1;
+            transition: all 0.3s ease;
+        }
+
+        .question h3 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .option-btn {
+            background: rgba(167, 78, 158, 0.2);
+            border: 1px solid rgba(167, 78, 158, 0.3);
+            color: var(--text-light);
+            border-radius: var(--border-radius);
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex: 1;
+            min-width: 150px;
+            text-align: center;
+        }
+
+        .option-btn:hover {
+            background: rgba(167, 78, 158, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .solution {
+            background: rgba(46, 125, 50, 0.2);
+            border: 1px solid rgba(46, 125, 50, 0.3);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .solution h3 {
+            color: var(--success-color);
+            margin-top: 0;
+        }
+
+        .solution-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .solution-list li {
+            padding: 8px 0;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .solution-list li:before {
+            content: "•";
+            color: var(--success-color);
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .warning-note {
+            background: rgba(230, 162, 60, 0.2);
+            border: 1px solid rgba(230, 162, 60, 0.3);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            margin-top: 20px;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .warning-icon {
+            color: var(--warning-color);
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .restart-btn {
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 500;
+            margin-top: 20px;
+            display: none;
+            transition: all 0.2s ease;
+        }
+
+        .restart-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .back-btn {
+            background: rgba(167, 78, 158, 0.2);
+            color: var(--text-light);
+            border: 1px solid rgba(167, 78, 158, 0.3);
+            padding: 12px 24px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 500;
+            margin-top: 20px;
+            margin-right: 10px;
+            display: none;
+            transition: all 0.2s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(167, 78, 158, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .path-history {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: var(--border-radius);
+            display: none;
+        }
+
+        .path-history h4 {
+            margin-top: 0;
+            color: var(--text-dim);
+        }
+
+        .path-steps {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .path-steps li {
+            position: relative;
+            padding-left: 30px;
+            margin-bottom: 10px;
+            opacity: 0.7;
+        }
+
+        .path-steps li:before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 8px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--primary-color);
+        }
+
+        .path-steps li:not(:last-child):after {
+            content: "";
+            position: absolute;
+            left: 5px;
+            top: 20px;
+            width: 2px;
+            height: calc(100% - 10px);
+            background: var(--primary-color);
+            opacity: 0.5;
+        }
+
+        .path-steps li:last-child {
+            opacity: 1;
+        }
+
+        .path-steps li:last-child:before {
+            background: var(--success-color);
+            box-shadow: 0 0 8px var(--success-color);
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .options {
+                flex-direction: column;
+            }
+            
+            .option-btn {
+                width: 100%;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" role="main">
+        <header>
+            <h1 id="main-title">Rapid Fusion PE320 Troubleshooting Guide</h1>
+            <p class="subtitle">Interactive decision tree for diagnosing and resolving extruder issues</p>
+        </header>
+        <nav aria-label="Main navigation" style="display:none;"></nav>
+        <main>
+            <section class="card" aria-labelledby="main-title">
+                <div class="decision-tree" id="decisionTree" aria-live="polite">
+                    <!-- Questions will be dynamically inserted here -->
+                </div>
+                <aside class="path-history" id="pathHistory" aria-label="Diagnosis Path">
+                    <h4>Diagnosis Path</h4>
+                    <ul class="path-steps" id="pathSteps">
+                        <!-- Path steps will be added here -->
+                    </ul>
+                </aside>
+                <div class="button-container">
+                    <button class="back-btn" id="backBtn" aria-label="Go back to previous step">Back</button>
+                    <button class="restart-btn" id="restartBtn" aria-label="Restart troubleshooting">Start Over</button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Define the decision tree structure
+        const decisionTree = {
+            start: {
+                question: "What would you like to do?",
+                options: [
+                    { text: "Troubleshoot an issue", next: "troubleshoot_menu" },
+                    { text: "View maintenance procedures", next: "maintenance_menu" },
+                    { text: "View safety guidelines", next: "safety_menu" },
+                    { text: "View installation guide", next: "installation_menu" },
+                    { text: "View optimization guides", next: "optimization_menu" }
+                ]
+            },
+            
+            troubleshoot_menu: {
+                question: "What issue are you experiencing with your PE320 Pellet Extruder?",
+                options: [
+                    { text: "Material not extruding", next: "no_extrusion" },
+                    { text: "Leakage from side of extruder", next: "side_leakage" },
+                    { text: "Clogged pellet intake", next: "clogged_intake" },
+                    { text: "Extruder not heating up", next: "not_heating" },
+                    { text: "Fan issues", next: "fan_issues" },
+                    { text: "Motor or mechanical issues", next: "motor_issues" },
+                    { text: "Pellet-specific issues", next: "pellet_issues" },
+                    { text: "Software/Control System issues", next: "software_issues" },
+                    { text: "Back to main menu", next: "start" }
+                ]
+            },
+            
+            maintenance_menu: {
+                question: "What maintenance procedure would you like to view?",
+                options: [
+                    { text: "Regular maintenance schedule", next: "regular_maintenance" },
+                    { text: "Barrel and screw maintenance", next: "barrel_maintenance" },
+                    { text: "Nozzle maintenance", next: "nozzle_maintenance" },
+                    { text: "Gearbox maintenance", next: "gearbox_maintenance" },
+                    { text: "Back to main menu", next: "start" }
+                ]
+            },
+            
+            safety_menu: {
+                question: "What safety guidelines would you like to view?",
+                options: [
+                    { text: "Emergency procedures", next: "emergency_procedures" },
+                    { text: "Hot end safety", next: "hot_end_safety" },
+                    { text: "Electrical safety", next: "electrical_safety" },
+                    { text: "Material handling safety", next: "material_safety" },
+                    { text: "PPE and Controls Hierarchy", next: "ppe_controls_hierarchy" },
+                    { text: "Back to main menu", next: "start" }
+                ]
+            },
+            
+            optimization_menu: {
+                question: "What optimization guide would you like to view?",
+                options: [
+                    { text: "Extrusion quality optimization", next: "extrusion_quality" },
+                    { text: "Production speed optimization", next: "production_speed" },
+                    { text: "Material efficiency", next: "material_efficiency" },
+                    { text: "Energy efficiency", next: "energy_efficiency" },
+                    { text: "Back to main menu", next: "start" }
+                ]
+            },
+            
+            installation_menu: {
+                question: "Which installation topic do you need help with?",
+                options: [
+                    { text: "Unboxing and Inspection", next: "unboxing_inspection" },
+                    { text: "Mechanical Installation", next: "mechanical_installation" },
+                    { text: "Electrical Installation", next: "electrical_installation" },
+                    { text: "Motor Connection", next: "motor_connection" },
+                    { text: "Back to main menu", next: "start" }
+                ]
+            },
+            
+            // No Extrusion Branch
+            no_extrusion: {
+                question: "What specifically is happening with the extrusion?",
+                options: [
+                    { text: "No material comes out at all", next: "no_material_output" },
+                    { text: "Inconsistent or intermittent extrusion", next: "inconsistent_extrusion" },
+                    { text: "Extrusion rate is too slow", next: "slow_extrusion" }
+                ]
+            },
+            
+            no_material_output: {
+                question: "Have you checked the following potential causes?",
+                options: [
+                    { text: "Extruder not properly heated", next: "solution_heater_check" },
+                    { text: "Material supply issue", next: "material_supply_issue" },
+                    { text: "Motor not running", next: "motor_not_running" },
+                    { text: "Clogged nozzle", next: "solution_clogged_nozzle" }
+                ]
+            },
+            
+            solution_heater_check: {
+                solution: true,
+                title: "Extruder Heating Issue Solution",
+                steps: [
+                    "Verify all four heating zones (Top: 140°C, Mid: 180°C, Bottom: 200°C, Nozzle: 220°C) have reached appropriate temperatures for your material.",
+                    "Allow the extruder to remain at temperature for at least 30 minutes before starting extrusion.",
+                    "Check that PT100 temperature sensors are properly connected and functioning.",
+                    "If temperature readings are incorrect, inspect PT100 connectors for damage.",
+                    "Ensure all heating zones are functioning - if any zone is not heating, check the corresponding heat coil resistance (should be 95Ω ±3% for zones 1-3, 80Ω ±3% for nozzle)."
+                ],
+                warning: "Failure to properly heat the extruder before operation could result in damage to the burst plug, barrel screw, or motor, which is not covered by warranty."
+            },
+            
+            material_supply_issue: {
+                question: "What is the status of your material supply?",
+                options: [
+                    { text: "Empty or low material hopper", next: "solution_refill_hopper" },
+                    { text: "Material sensors not detecting properly", next: "solution_material_sensors" },
+                    { text: "Air flow issues with material feeding", next: "solution_air_flow" }
+                ]
+            },
+            
+            solution_refill_hopper: {
+                solution: true,
+                title: "Hopper Material Supply Solution",
+                steps: [
+                    "Check that the hopper contains sufficient pellet material.",
+                    "Ensure pellets are dry and of the correct size (spherical, 3-5mm diameter).",
+                    "Verify the pellet intake is not clogged or blocked.",
+                    "If using the Rapid Fusion Air Plus module, check that it is properly connected and providing sufficient air pressure.",
+                    "Refill the hopper and restart the extrusion process."
+                ]
+            },
+            
+            solution_material_sensors: {
+                solution: true,
+                title: "Material Sensor Issue Solution",
+                steps: [
+                    "Check that the Balluff capacitive proximity sensors are properly connected and functioning.",
+                    "Clean the sensors if they appear to be covered with material residue.",
+                    "Verify the sensors are correctly positioned to detect material levels.",
+                    "Check the sensor signals in the control system to ensure they're being properly recognized.",
+                    "If using Epicurus controller, ensure the material sensing system is properly configured."
+                ]
+            },
+            
+            solution_air_flow: {
+                solution: true,
+                title: "Air Flow System Solution",
+                steps: [
+                    "Verify that your compressed air supply meets the requirements (Line Vac 6082 25.9 SCFM @ 80PSI).",
+                    "Check all connections between the air supply, control box, venturi valve, and extruder.",
+                    "Ensure the venturi valve is functioning properly and creates sufficient vacuum.",
+                    "Inspect the conveying tube for blockages or damage.",
+                    "Check that the camlock connector forms an airtight seal.",
+                    "If using Rapid Fusion control system, verify the 3-second burst cycle is operating correctly."
+                ]
+            },
+            
+            motor_not_running: {
+                question: "What motor issues are you experiencing?",
+                options: [
+                    { text: "Motor doesn't turn at all", next: "solution_motor_not_turning" },
+                    { text: "Motor makes noise but doesn't turn", next: "solution_motor_stalled" },
+                    { text: "Motor turns but no extrusion occurs", next: "solution_motor_no_extrusion" }
+                ]
+            },
+            
+            solution_motor_not_turning: {
+                solution: true,
+                title: "Motor Not Turning Solution",
+                steps: [
+                    "Check that the motor is properly connected to the servo drive according to the manufacturer's wiring diagram.",
+                    "Verify that the servo drive is receiving power and is properly configured.",
+                    "Check for error codes or warnings on the servo drive display.",
+                    "Confirm that the control signal (STEP/DIR, EtherCAT, or Ethernet IP) is being sent to the servo drive.",
+                    "Ensure the motor cables are intact and properly connected.",
+                    "For V1 Extruder: Check XEC-230-15 drive using CME software.",
+                    "For V2 Extruder: Check LXM32MD18N4 drive using SoMove software."
+                ],
+                warning: "Always disconnect power before working on electrical connections, and only qualified personnel should perform electrical work."
+            },
+            
+            solution_motor_stalled: {
+                solution: true,
+                title: "Motor Stalled Solution",
+                steps: [
+                    "Ensure the extruder has reached proper operating temperature for at least 30 minutes prior to operation.",
+                    "Check if material in the barrel is properly melted.",
+                    "Verify the motor isn't overloaded due to excessive torque requirements - check servo drive parameters.",
+                    "Look for obstructions in the extrusion path or barrel.",
+                    "Inspect the gearbox connection to ensure it's properly engaging the extrusion screw.",
+                    "For V1 Extruder: Check the CP025S-MF2-25-1E1-2S gearbox for damage.",
+                    "For V2 Extruder: Check the GBX080025K gearbox for damage."
+                ],
+                warning: "Operating the extruder without proper heating can cause serious damage to the motor, gearbox, or screw mechanism."
+            },
+            
+            solution_motor_no_extrusion: {
+                solution: true,
+                title: "Motor Turning But No Extrusion Solution",
+                steps: [
+                    "Check for a clogged nozzle or barrel blockage.",
+                    "Verify that material is being properly fed into the extruder.",
+                    "Inspect the screw mechanism to ensure it's intact and properly engaging with the material.",
+                    "Check that the temperature of all zones is appropriate for your material.",
+                    "Verify the motor is turning in the correct direction.",
+                    "Ensure the motor speed (RPM) is sufficient for extrusion (recommended starting point: 15 RPM screw speed)."
+                ]
+            },
+            
+            inconsistent_extrusion: {
+                question: "What type of inconsistency are you seeing?",
+                options: [
+                    { text: "Material flow stops and starts", next: "solution_intermittent_flow" },
+                    { text: "Varying extrusion rate", next: "solution_varying_rate" },
+                    { text: "Air bubbles or gaps in extrusion", next: "solution_air_bubbles" }
+                ]
+            },
+            
+            solution_intermittent_flow: {
+                solution: true,
+                title: "Intermittent Material Flow Solution",
+                steps: [
+                    "Check for inconsistent material feeding from the hopper or air delivery system.",
+                    "Verify that material sensors are functioning properly and consistently triggering the feed mechanism.",
+                    "Inspect for partial blockages in the pellet intake or barrel that may be creating temporary obstructions.",
+                    "Check for temperature fluctuations that might be causing material to temporarily solidify.",
+                    "Verify motor speed consistency - look for fluctuations in the servo drive output.",
+                    "Ensure the pellets are of uniform size and quality."
+                ]
+            },
+            
+            solution_varying_rate: {
+                solution: true,
+                title: "Varying Extrusion Rate Solution",
+                steps: [
+                    "Perform a throughput calibration as outlined in Section 17 of the user manual.",
+                    "Check that your servo control parameters are stable and not fluctuating.",
+                    "Verify that the material temperature is consistent throughout all heating zones.",
+                    "Ensure pellet feeding is consistent and the hopper remains adequately filled.",
+                    "Check for inconsistencies in the incoming material (size, moisture content, etc.).",
+                    "If using a Duet system, verify M592 nonlinear extrusion settings are correctly configured.",
+                    "If using AiSync software, check the throughput calibration coefficients."
+                ]
+            },
+            
+            solution_air_bubbles: {
+                solution: true,
+                title: "Air Bubbles in Extrusion Solution",
+                steps: [
+                    "Check that your material is properly dried according to manufacturer specifications.",
+                    "Ensure consistent pellet feeding without gaps or air pockets.",
+                    "Verify that temperature settings are appropriate for your material to properly melt and remove air.",
+                    "Try running the extruder at a slower speed to allow air to escape.",
+                    "Consider performing a purge procedure (running the extruder for 90 seconds at ¼ speed) to clear any trapped air.",
+                    "Check that your nozzle is properly tightened and not allowing air to enter the extrusion path."
+                ]
+            },
+            
+            slow_extrusion: {
+                solution: true,
+                title: "Slow Extrusion Rate Solution",
+                steps: [
+                    "Verify that the motor speed (RPM) is set correctly for your application.",
+                    "For 15 RPM screw speed with a 25:1 gearbox, the motor RPM should be around 375 RPM.",
+                    "Check that all heating zones are reaching proper temperature for your material - higher viscosity materials may need higher temperatures.",
+                    "Ensure the nozzle size is appropriate for your desired flow rate.",
+                    "Verify servo drive parameters are correctly configured for the desired extrusion rate.",
+                    "Perform throughput calibration to establish the correct relationship between motor speed and extrusion rate.",
+                    "Check the extruder for partial blockages that might be restricting flow."
+                ]
+            },
+            
+            // Side Leakage Branch
+            side_leakage: {
+                solution: true,
+                title: "Material Leaking from Side of Extruder",
+                steps: [
+                    "This indicates that the burst plug (rupture disk) has failed, likely due to overpressure in the barrel.",
+                    "The most common cause is extruding before the barrel reached appropriate temperature.",
+                    "To replace the burst plug:",
+                    "1. Heat the extruder to the material's molten temperature to facilitate removal.",
+                    "2. Unscrew the burst plug located near the nozzle heater.",
+                    "3. Clean the screw hole and remove any excess material.",
+                    "4. Install a replacement burst plug and tighten to the specified torque value (25Nm).",
+                    "Always verify the barrel temperature is appropriate before resuming extrusion to prevent future failures."
+                ],
+                warning: "Ensure the extruder is properly heated for at least 30 minutes before operation to prevent burst plug failures. This type of damage is not covered by warranty."
+            },
+            
+            // Clogged Intake Branch
+            clogged_intake: {
+                solution: true,
+                title: "Clogged Pellet Intake Solution",
+                steps: [
+                    "This typically occurs if the extruder has been left hot and idle for more than 12 hours, causing semi-molten material to clog the intake hole.",
+                    "To resolve this issue:",
+                    "1. Ensure the robot and controller are powered off to prevent unexpected extrusion.",
+                    "2. Turn off the compressor or disconnect the dual material sensors to avoid pellet explosion.",
+                    "3. Use a vacuum and tubing to remove pellets from the material hopper until it is empty.",
+                    "4. Remove the bolts securing the material hopper and carefully clear any clogs near the pellet intake hole.",
+                    "5. Reassemble the hopper and ensure it's properly secured before resuming operation."
+                ],
+                warning: "Always turn off the compressor or disconnect material sensors before attempting to clear a clogged intake to prevent pellet explosion."
+            },
+            
+            // Not Heating Branch
+            not_heating: {
+                question: "Which heating zones are not reaching temperature?",
+                options: [
+                    { text: "One or more specific zones", next: "specific_zones_not_heating" },
+                    { text: "All zones not heating", next: "all_zones_not_heating" },
+                    { text: "Inconsistent temperatures", next: "inconsistent_temperatures" }
+                ]
+            },
+            
+            specific_zones_not_heating: {
+                solution: true,
+                title: "Specific Heating Zones Not Working Solution",
+                steps: [
+                    "Verify that the PT100 temperature sensors for the affected zones are properly connected.",
+                    "Check the resistance of the heating elements for the affected zones:",
+                    "- Heat Coil 1-3 should measure approximately 95Ω (±3%)",
+                    "- Nozzle Coil should measure approximately 80Ω (±3%)",
+                    "Check the solid state relays (SSR) or control signals for the affected zones.",
+                    "Verify that the Rapid Fusion controller is sending proper heating commands to the affected zones.",
+                    "Inspect wiring connections for the affected heating elements.",
+                    "If using the Epicurus controller, check the zone settings in the controller interface."
+                ]
+            },
+            
+            all_zones_not_heating: {
+                solution: true,
+                title: "All Heating Zones Not Working Solution",
+                steps: [
+                    "Check that the main power to the heating system is connected and turned on.",
+                    "Verify that the control system is properly configured and sending heating commands.",
+                    "Check for tripped circuit breakers or blown fuses in the control panel.",
+                    "Verify that all PT100 sensors are properly connected.",
+                    "If using Epicurus controller, check the boot-up sequence was properly completed.",
+                    "For V1 Extruder: Turn maintenance key switch to 'ON', reset E-stop, turn on mains switch, press flashing blue 'Reset' button.",
+                    "For V2 Extruder: Reset E-stop, turn on mains switch, press flashing blue 'Reset' button."
+                ]
+            },
+            
+            inconsistent_temperatures: {
+                solution: true,
+                title: "Inconsistent Temperature Readings Solution",
+                steps: [
+                    "Check that all PT100 temperature sensors are properly seated in their designated ports using the Bayonet fittings.",
+                    "Inspect PT100 sensor wiring for damage or intermittent connections.",
+                    "Verify the control system PID parameters are correctly tuned to prevent temperature oscillation.",
+                    "Check for airflow issues that might be causing uneven cooling (e.g., improperly directed cooling fans).",
+                    "Ensure the ambient environment doesn't have significant temperature fluctuations or drafts.",
+                    "If using multiple heating zones, ensure they're properly insulated from each other to prevent heat bleed."
+                ]
+            },
+            
+            // Fan Issues Branch
+            fan_issues: {
+                question: "Which fans are experiencing issues?",
+                options: [
+                    { text: "Heat break fans (extruder cooling)", next: "heat_break_fans" },
+                    { text: "Body fans (top, middle, bottom)", next: "body_fans" },
+                    { text: "All fans not working", next: "all_fans" }
+                ]
+            },
+            
+            heat_break_fans: {
+                solution: true,
+                title: "Heat Break Fans Solution",
+                steps: [
+                    "The heat break fans should automatically turn on at 60°C when using the Rapid Fusion control panel.",
+                    "Verify that the extruder temperature has reached the fan activation threshold.",
+                    "Check that the fans are receiving proper 12V power supply.",
+                    "Inspect fan wiring connections for any damage or loose terminals.",
+                    "Check that the fan blades can rotate freely and aren't obstructed.",
+                    "Measure the fan tach signal to verify proper operation - nominal RPM should be around 9000 RPM at 50% duty cycle and 18000 RPM at 100% duty cycle.",
+                    "If fans are spinning but not providing sufficient cooling, check for dust buildup or damage to the fan blades."
+                ],
+                warning: "Heat break fans are critical for preventing heat from traveling up the extruder body. Failure of these fans can lead to filament softening in the feed zone, causing blockages."
+            },
+            
+            body_fans: {
+                solution: true,
+                title: "Body Fans (Top, Middle, Bottom) Solution",
+                steps: [
+                    "Check that the fans are receiving proper 12V power supply.",
+                    "Verify fan connections to the control system.",
+                    "Inspect for physical damage to the fans or obstructions to the fan blades.",
+                    "Measure the fan tach signals to verify proper operation:",
+                    "- Top/Middle/Bottom fans should show approximately 6000 RPM at 50% duty cycle",
+                    "- Top/Middle/Bottom fans should show approximately 12000 RPM at 100% duty cycle",
+                    "Check control system settings for the fan duty cycle.",
+                    "Ensure fans are properly mounted and secured in their positions."
+                ]
+            },
+            
+            all_fans: {
+                solution: true,
+                title: "All Fans Not Working Solution",
+                steps: [
+                    "Check the power supply to all fans - verify 12V is present at the fan connections.",
+                    "Inspect the control box for any tripped breakers or blown fuses affecting the fan circuits.",
+                    "Verify that fan control signals are being sent from the controller.",
+                    "If using Epicurus controller, check that the fan control settings are properly configured.",
+                    "Inspect the wiring loom connections for damage or loose terminals.",
+                    "Check for any error messages or alerts on the control system related to fan operation.",
+                    "If the issue persists, there may be a failure in the control board or power distribution system."
+                ]
+            },
+            
+            // Motor Issues Branch
+            motor_issues: {
+                question: "What type of motor or mechanical issue are you experiencing?",
+                options: [
+                    { text: "Motor not turning", next: "solution_motor_not_turning" },
+                    { text: "Unusual noise from motor or gearbox", next: "unusual_noise" },
+                    { text: "Motor stopping unexpectedly", next: "motor_stopping" },
+                    { text: "Gearbox issues", next: "gearbox_issues" }
+                ]
+            },
+            
+            unusual_noise: {
+                solution: true,
+                title: "Unusual Noise from Motor or Gearbox Solution",
+                steps: [
+                    "Check that the gearbox is properly lubricated according to the Wittenstein gearbox instructions.",
+                    "Inspect the mounting bolts for the motor and gearbox to ensure they are properly tightened.",
+                    "Verify that the motor is not overloaded or operating beyond its rated torque capacity.",
+                    "Check for any foreign objects or material buildup that might be causing interference.",
+                    "Inspect the gearbox for signs of damage or excessive wear.",
+                    "For V1 Extruder: Check the CP025S-MF2-25-1E1-2S gearbox.",
+                    "For V2 Extruder: Check the GBX080025K gearbox.",
+                    "If grinding noise is heard, immediately stop operation and inspect for material blockage in the barrel."
+                ],
+                warning: "Continuing to operate with unusual noises can lead to severe damage to the motor, gearbox, or extrusion screw."
+            },
+            
+            motor_stopping: {
+                solution: true,
+                title: "Motor Stopping Unexpectedly Solution",
+                steps: [
+                    "Check the servo drive for error codes or warnings that might indicate the cause of the stoppage.",
+                    "Verify that the motor isn't overheating - check for proper cooling and ventilation.",
+                    "Check if over-current protection is being triggered due to excessive load or blockage.",
+                    "Inspect the material path for blockages that might be causing the motor to stall.",
+                    "Verify that the extruder has reached proper temperature before operation.",
+                    "Check servo drive parameters to ensure they're correctly configured for the application.",
+                    "For V1 Extruder: Check XEC-230-15 drive using CME software.",
+                    "For V2 Extruder: Check LXM32MD18N4 drive using SoMove software."
+                ]
+            },
+            
+            gearbox_issues: {
+                solution: true,
+                title: "Gearbox Issues Solution",
+                steps: [
+                    "Check that the gearbox is properly lubricated per the manufacturer's recommendations.",
+                    "Inspect the grease plugs to ensure they're properly installed (refer to user manual diagram).",
+                    "Check for signs of overheating or discoloration that might indicate excessive friction.",
+                    "Verify that the gearbox is not being operated beyond its torque capacity.",
+                    "Inspect the mounting and connection points for proper alignment and tightness.",
+                    "Check that the extrusion screw is properly connected to the gearbox output.",
+                    "If unusual noises or vibrations are present, inspect for internal damage or wear.",
+                    "For persistent issues, consult the gearbox manufacturer documentation included with your PE320 Pellet Extruder."
+                ]
+            },
+            
+            // Clogged Nozzle Solution
+            solution_clogged_nozzle: {
+                solution: true,
+                title: "Clogged Nozzle Solution",
+                steps: [
+                    "Ensure the extruder is at full operating temperature appropriate for your material.",
+                    "Attempt to purge the system by running the extruder at ¼ speed (1000 rpm motor speed) for 90 seconds.",
+                    "If purging doesn't clear the clog, you may need to remove and clean the nozzle:",
+                    "1. Heat the extruder to the material's melting temperature.",
+                    "2. Use appropriate tools to carefully remove the nozzle.",
+                    "3. Clean the nozzle using appropriate tools and heat resistant gloves.",
+                    "4. Check for damage to the nozzle and replace if necessary.",
+                    "5. Reinstall the nozzle, ensuring proper tightening.",
+                    "Consider using a purging compound (e.g., Air Tech Dahlpram 009) to help clear residual material."
+                ],
+                warning: "Always wear appropriate heat resistant gloves (EN420 standard) and safety goggles (ANSI Z87.1 standard) when working with hot components."
+            },
+            
+            // Pellet-Specific Issues Branch
+            pellet_issues: {
+                question: "What pellet-related issue are you experiencing?",
+                options: [
+                    { text: "Pellet feeding problems", next: "pellet_feeding" },
+                    { text: "Pellet size/shape issues", next: "pellet_size" },
+                    { text: "Material contamination", next: "material_contamination" },
+                    { text: "Pellet moisture issues", next: "pellet_moisture" }
+                ]
+            },
+            
+            pellet_feeding: {
+                solution: true,
+                title: "Pellet Feeding Issues Solution",
+                steps: [
+                    "Check that pellets are within the recommended size range (3-5mm diameter).",
+                    "Verify the pellet hopper is properly aligned with the feed throat.",
+                    "Ensure the venturi system is creating sufficient vacuum for pellet transport.",
+                    "Check for any obstructions in the pellet feed path.",
+                    "Verify the material sensors are properly detecting pellet flow.",
+                    "For irregular feeding: Adjust the air pressure to the venturi system (recommended: 80PSI).",
+                    "Check that the pellet feed rate matches the extruder's capacity."
+                ],
+                warning: "Improper pellet feeding can cause inconsistent extrusion and potential damage to the extruder."
+            },
+            
+            pellet_size: {
+                solution: true,
+                title: "Pellet Size/Shape Issues Solution",
+                steps: [
+                    "Verify pellets are spherical and within 3-5mm diameter range.",
+                    "Check for oversized pellets that might cause bridging in the feed throat.",
+                    "Inspect for undersized pellets or fines that might cause feeding issues.",
+                    "Ensure pellets are not elongated or irregularly shaped.",
+                    "If using regrind material, verify it has been properly processed to correct size.",
+                    "Consider using a pellet sizer or screen to ensure consistent pellet size."
+                ],
+                warning: "Using pellets outside the recommended size range can cause feeding issues and inconsistent extrusion."
+            },
+            
+            material_contamination: {
+                solution: true,
+                title: "Material Contamination Solution",
+                steps: [
+                    "Inspect pellets for foreign materials or contaminants.",
+                    "Check for metal particles that could damage the extruder.",
+                    "Verify that the material storage containers are clean and sealed.",
+                    "Inspect the pellet feed system for any contamination sources.",
+                    "If contamination is found, thoroughly clean the entire feed system.",
+                    "Implement a material inspection procedure before loading pellets."
+                ],
+                warning: "Contaminated material can cause severe damage to the extruder and is not covered by warranty."
+            },
+            
+            pellet_moisture: {
+                solution: true,
+                title: "Pellet Moisture Issues Solution",
+                steps: [
+                    "Check if pellets show signs of moisture absorption (swelling, sticking).",
+                    "Verify material has been properly dried according to manufacturer specifications.",
+                    "For hygroscopic materials (e.g., PET, Nylon):",
+                    "1. Dry at recommended temperature (typically 70-80°C)",
+                    "2. Maintain drying for recommended time (typically 4-6 hours)",
+                    "3. Use a dehumidified hopper or dry air purge system",
+                    "Check for steam or bubbles in the extruded material.",
+                    "Consider using a moisture analyzer to verify pellet moisture content."
+                ],
+                warning: "Moisture in pellets can cause poor extrusion quality, bubbles, and potential damage to the extruder."
+            },
+            
+            // Software/Control System Issues Branch
+            software_issues: {
+                question: "What type of software or control system issue are you experiencing?",
+                options: [
+                    { text: "Connection/Communication issues", next: "connection_issues" },
+                    { text: "Temperature control problems", next: "temp_control_issues" },
+                    { text: "Motor control issues", next: "motor_control_issues" },
+                    { text: "System calibration problems", next: "calibration_issues" }
+                ]
+            },
+            
+            connection_issues: {
+                solution: true,
+                title: "Connection/Communication Issues Solution",
+                steps: [
+                    "For Ethernet/IP issues:",
+                    "1. Check network cable connections",
+                    "2. Verify IP address configuration",
+                    "3. Check network switch status",
+                    "For EtherCAT issues:",
+                    "1. Verify EtherCAT cable connections",
+                    "2. Check EtherCAT master configuration",
+                    "3. Verify node addressing",
+                    "For STEP/DIR issues:",
+                    "1. Check signal cable connections",
+                    "2. Verify pulse frequency settings",
+                    "3. Check signal voltage levels",
+                    "General troubleshooting:",
+                    "1. Power cycle the control system",
+                    "2. Check for firmware updates",
+                    "3. Verify controller compatibility"
+                ],
+                warning: "Always follow proper shutdown procedures before disconnecting any communication cables."
+            },
+            
+            temp_control_issues: {
+                solution: true,
+                title: "Temperature Control Issues Solution",
+                steps: [
+                    "For temperature fluctuations:",
+                    "1. Check PID tuning parameters",
+                    "2. Verify thermocouple connections",
+                    "3. Inspect SSR (Solid State Relay) operation",
+                    "For temperature reading errors:",
+                    "1. Verify PT100 sensor connections",
+                    "2. Check sensor calibration",
+                    "3. Verify wiring integrity",
+                    "For heating element control:",
+                    "1. Check SSR output signals",
+                    "2. Verify power supply to heaters",
+                    "3. Inspect heating element resistance"
+                ],
+                warning: "Incorrect temperature control can lead to material degradation or equipment damage."
+            },
+            
+            motor_control_issues: {
+                solution: true,
+                title: "Motor Control Issues Solution",
+                steps: [
+                    "For V1 Extruder (XEC-230-15 drive):",
+                    "1. Check CME software configuration",
+                    "2. Verify motor parameters",
+                    "3. Check encoder feedback",
+                    "For V2 Extruder (LXM32MD18N4 drive):",
+                    "1. Check SoMove software settings",
+                    "2. Verify motor tuning",
+                    "3. Check EtherCAT communication",
+                    "Common issues:",
+                    "1. Verify motor current limits",
+                    "2. Check speed/acceleration settings",
+                    "3. Verify torque limits"
+                ],
+                warning: "Incorrect motor parameters can cause excessive wear or damage to the extruder."
+            },
+            
+            calibration_issues: {
+                solution: true,
+                title: "System Calibration Issues Solution",
+                steps: [
+                    "For throughput calibration:",
+                    "1. Follow Section 17 of the user manual",
+                    "2. Verify material flow rate",
+                    "3. Check motor speed calibration",
+                    "For temperature calibration:",
+                    "1. Verify PT100 sensor readings",
+                    "2. Check temperature offsets",
+                    "3. Calibrate using reference thermometer",
+                    "For material feed calibration:",
+                    "1. Verify pellet feed rate",
+                    "2. Check venturi vacuum settings",
+                    "3. Calibrate material sensors"
+                ],
+                warning: "Regular calibration is essential for consistent extrusion quality."
+            },
+            
+            // Maintenance Procedures Branch
+            regular_maintenance: {
+                solution: true,
+                title: "Regular Maintenance Schedule",
+                steps: [
+                    "Daily maintenance:",
+                    "1. Clean pellet hopper and feed system",
+                    "2. Check for material leaks",
+                    "3. Verify temperature readings",
+                    "Weekly maintenance:",
+                    "1. Inspect and clean venturi system",
+                    "2. Check air filter condition",
+                    "3. Verify material sensor operation",
+                    "Monthly maintenance:",
+                    "1. Inspect barrel and screw for wear",
+                    "2. Check gearbox lubrication",
+                    "3. Verify heater and thermocouple operation",
+                    "Quarterly maintenance:",
+                    "1. Replace burst plug if needed",
+                    "2. Check all electrical connections",
+                    "3. Verify motor and drive alignment"
+                ],
+                warning: "Regular maintenance is essential for optimal performance and longevity of the extruder."
+            },
+            
+            barrel_maintenance: {
+                solution: true,
+                title: "Barrel and Screw Maintenance",
+                steps: [
+                    "Cleaning procedure:",
+                    "1. Heat extruder to material's melting temperature",
+                    "2. Run purging compound through system",
+                    "3. Allow to cool and remove residual material",
+                    "Inspection points:",
+                    "1. Check barrel for scoring or wear",
+                    "2. Inspect screw flights for damage",
+                    "3. Verify screw-to-barrel clearance",
+                    "Maintenance tips:",
+                    "1. Use appropriate cleaning tools",
+                    "2. Never use metal tools inside barrel",
+                    "3. Follow proper reassembly procedures"
+                ],
+                warning: "Improper barrel maintenance can lead to material degradation and equipment damage."
+            },
+            
+            nozzle_maintenance: {
+                solution: true,
+                title: "Nozzle Maintenance",
+                steps: [
+                    "Cleaning procedure:",
+                    "1. Heat nozzle to material's melting temperature",
+                    "2. Remove nozzle carefully",
+                    "3. Clean with appropriate tools",
+                    "Inspection points:",
+                    "1. Check for wear or damage",
+                    "2. Verify orifice size",
+                    "3. Inspect threads for damage",
+                    "Replacement procedure:",
+                    "1. Ensure proper temperature",
+                    "2. Use correct torque (25Nm)",
+                    "3. Verify proper seating"
+                ],
+                warning: "Always wear heat-resistant gloves when handling hot nozzles."
+            },
+            
+            gearbox_maintenance: {
+                solution: true,
+                title: "Gearbox Maintenance",
+                steps: [
+                    "For V1 Extruder (CP025S-MF2-25-1E1-2S):",
+                    "1. Check lubrication every 3 months",
+                    "2. Verify proper grease quantity",
+                    "3. Inspect for leaks",
+                    "For V2 Extruder (GBX080025K):",
+                    "1. Follow manufacturer's lubrication schedule",
+                    "2. Check oil level regularly",
+                    "3. Monitor temperature",
+                    "Common maintenance:",
+                    "1. Check for unusual noises",
+                    "2. Monitor temperature",
+                    "3. Verify proper alignment"
+                ],
+                warning: "Improper gearbox maintenance can lead to catastrophic failure."
+            },
+            
+            // Safety Concerns Branch
+            emergency_procedures: {
+                solution: true,
+                title: "Emergency Procedures",
+                steps: [
+                    "Emergency stop procedure:",
+                    "1. Press E-stop button immediately",
+                    "2. Turn off main power",
+                    "3. Allow system to cool",
+                    "Material spill procedure:",
+                    "1. Stop extrusion immediately",
+                    "2. Contain spill area",
+                    "3. Allow material to cool before cleanup",
+                    "Fire safety:",
+                    "1. Use appropriate fire extinguisher (Class D for metal fires)",
+                    "2. Evacuate area if necessary",
+                    "3. Call emergency services"
+                ],
+                warning: "Always know the location of emergency stops and fire extinguishers."
+            },
+            
+            hot_end_safety: {
+                solution: true,
+                title: "Hot End Safety",
+                steps: [
+                    "Temperature safety:",
+                    "1. Never touch hot components without protection",
+                    "2. Use heat-resistant gloves (EN420 standard)",
+                    "3. Wear safety goggles (ANSI Z87.1)",
+                    "Maintenance safety:",
+                    "1. Allow proper cooling time",
+                    "2. Use appropriate tools",
+                    "3. Follow lockout/tagout procedures",
+                    "Operation safety:",
+                    "1. Keep area clear of flammable materials",
+                    "2. Monitor temperature closely",
+                    "3. Use proper ventilation"
+                ],
+                warning: "Hot components can cause severe burns. Always use proper PPE."
+            },
+            
+            electrical_safety: {
+                solution: true,
+                title: "Electrical Safety Guidelines",
+                steps: [
+                    "General electrical safety:",
+                    "1. Always disconnect power before maintenance",
+                    "2. Use proper lockout/tagout procedures",
+                    "3. Verify power is off before working on electrical components",
+                    "Wiring safety:",
+                    "1. Check for damaged or frayed wires",
+                    "2. Ensure proper grounding",
+                    "3. Verify correct voltage ratings",
+                    "Component safety:",
+                    "1. Check SSR (Solid State Relay) operation",
+                    "2. Verify heater connections",
+                    "3. Inspect motor wiring",
+                    "Control system safety:",
+                    "1. Follow proper startup/shutdown procedures",
+                    "2. Check emergency stop functionality",
+                    "3. Verify safety interlocks"
+                ],
+                warning: "Only qualified personnel should perform electrical work. Always follow local electrical codes and regulations."
+            },
+            
+            material_safety: {
+                solution: true,
+                title: "Material Handling Safety",
+                steps: [
+                    "Pellet handling:",
+                    "1. Wear appropriate PPE (gloves, safety glasses)",
+                    "2. Avoid inhaling pellet dust",
+                    "3. Store materials in appropriate containers",
+                    "Material processing:",
+                    "1. Follow material-specific safety guidelines",
+                    "2. Use proper ventilation for fumes",
+                    "3. Monitor material temperature",
+                    "Storage safety:",
+                    "1. Store materials in dry, cool locations",
+                    "2. Keep away from heat sources",
+                    "3. Follow material-specific storage requirements",
+                    "Waste handling:",
+                    "1. Allow materials to cool before disposal",
+                    "2. Follow local waste disposal regulations",
+                    "3. Use appropriate containers for waste"
+                ],
+                warning: "Always refer to material safety data sheets (MSDS) for specific handling requirements."
+            },
+            
+            ppe_controls_hierarchy: {
+                solution: true,
+                title: "PPE and Hierarchy of Controls",
+                steps: [
+                    "Always wear appropriate PPE: heat-resistant gloves (EN420), safety goggles (ANSI Z87.1), and a P100 respirator when handling hot components or during extrusion.",
+                    "Ensure proper fit and regular replacement of respirator filters as per manufacturer recommendations.",
+                    "Follow the hierarchy of controls for risk mitigation:",
+                    "1. Elimination/Substitution: Remove or replace hazards where possible.",
+                    "2. Engineering Controls: Use machine guarding, ventilation, or automation to isolate hazards.",
+                    "3. Administrative Controls: Implement safe work practices, training, and procedures.",
+                    "4. PPE: Use as a last line of defense when other controls are insufficient."
+                ],
+                warning: "PPE is essential but should not be the only safety measure. Always prioritize elimination, engineering, and administrative controls first."
+            },
+            
+            // Performance Optimization Branch
+            performance_optimization: {
+                question: "What aspect of performance needs optimization?",
+                options: [
+                    { text: "Extrusion quality", next: "extrusion_quality" },
+                    { text: "Production speed", next: "production_speed" },
+                    { text: "Material efficiency", next: "material_efficiency" },
+                    { text: "Energy efficiency", next: "energy_efficiency" }
+                ]
+            },
+            
+            extrusion_quality: {
+                solution: true,
+                title: "Extrusion Quality Optimization",
+                steps: [
+                    "Material preparation:",
+                    "1. Ensure proper material drying",
+                    "2. Verify pellet size consistency",
+                    "3. Check material quality",
+                    "Process optimization:",
+                    "1. Fine-tune temperature profiles",
+                    "2. Optimize screw speed",
+                    "3. Adjust venturi vacuum settings",
+                    "Quality checks:",
+                    "1. Monitor extrusion diameter",
+                    "2. Check for bubbles or voids",
+                    "3. Verify material consistency"
+                ],
+                warning: "Quality optimization requires careful monitoring and adjustment."
+            },
+            
+            production_speed: {
+                solution: true,
+                title: "Production Speed Optimization",
+                steps: [
+                    "System optimization:",
+                    "1. Verify motor speed settings",
+                    "2. Check gearbox efficiency",
+                    "3. Optimize temperature profiles",
+                    "Material handling:",
+                    "1. Ensure consistent pellet feeding",
+                    "2. Optimize venturi settings",
+                    "3. Verify material sensor timing",
+                    "Process optimization:",
+                    "1. Fine-tune acceleration profiles",
+                    "2. Optimize cooling settings",
+                    "3. Check for bottlenecks"
+                ],
+                warning: "Do not exceed manufacturer's recommended maximum speeds."
+            },
+            
+            material_efficiency: {
+                solution: true,
+                title: "Material Efficiency Optimization",
+                steps: [
+                    "Pellet usage optimization:",
+                    "1. Monitor and minimize material waste",
+                    "2. Optimize pellet size for consistent feeding",
+                    "3. Implement proper material drying procedures",
+                    "Process optimization:",
+                    "1. Fine-tune extrusion parameters",
+                    "2. Optimize temperature profiles for material type",
+                    "3. Monitor material flow consistency",
+                    "Waste reduction:",
+                    "1. Implement proper purging procedures",
+                    "2. Optimize startup/shutdown sequences",
+                    "3. Recycle suitable waste material",
+                    "Quality control:",
+                    "1. Monitor extrusion quality",
+                    "2. Implement regular quality checks",
+                    "3. Track material usage patterns"
+                ],
+                warning: "Regular monitoring and adjustment is key to maintaining material efficiency."
+            },
+            
+            energy_efficiency: {
+                solution: true,
+                title: "Energy Efficiency Optimization",
+                steps: [
+                    "Heating system optimization:",
+                    "1. Optimize temperature profiles",
+                    "2. Implement proper insulation",
+                    "3. Use efficient heating elements",
+                    "Motor efficiency:",
+                    "1. Optimize motor speed settings",
+                    "2. Implement proper cooling",
+                    "3. Monitor motor performance",
+                    "System optimization:",
+                    "1. Implement efficient startup procedures",
+                    "2. Optimize idle power consumption",
+                    "3. Monitor overall energy usage",
+                    "Process optimization:",
+                    "1. Optimize production schedules",
+                    "2. Implement energy-saving modes",
+                    "3. Monitor and reduce standby power"
+                ],
+                warning: "Energy efficiency improvements should not compromise safety or product quality."
+            },
+            
+            unboxing_inspection: {
+                solution: true,
+                title: "Unboxing and Inspection",
+                steps: [
+                    "Wear level 3 cut-resistant gloves before unboxing.",
+                    "Use a PZ3 screwdriver or pry bar to open the crate.",
+                    "At least two people should lift the 25kg extruder.",
+                    "Inspect for damage before use. If in doubt, contact support and do not operate until resolved."
+                ]
+            },
+            
+            mechanical_installation: {
+                solution: true,
+                title: "Mechanical Installation",
+                steps: [
+                    "Wear level 3 cut-resistant gloves and safety goggles.",
+                    "Ensure the motion system is powered off and disconnected from mains.",
+                    "Use M8 x 25mm bolts and align the mounting plate as per the manual.",
+                    "Tighten bolts firmly and check for secure installation."
+                ]
+            },
+            
+            electrical_installation: {
+                solution: true,
+                title: "Electrical Installation",
+                steps: [
+                    "Only competent persons should perform electrical installation.",
+                    "Disconnect power before starting.",
+                    "Use insulated tools and work in a dry environment.",
+                    "Verify all components are rated for the system's voltage and current.",
+                    "Follow the wiring diagram for the HARTING plug and connect PT100 sensors and relays as specified."
+                ]
+            },
+            
+            motor_connection: {
+                solution: true,
+                title: "Motor Connection",
+                steps: [
+                    "Refer to the servo drive manual for wiring and configuration.",
+                    "Securely connect motor cables to the servo drive as per the manual.",
+                    "Configure the drive according to the motor's specifications and operational requirements."
+                ]
+            }
+        };
+
+        // Initialize variables
+        let currentQuestion = 'start';
+        const pathHistory = [];
+
+        // DOM elements
+        const decisionTreeElement = document.getElementById('decisionTree');
+        const pathHistoryElement = document.getElementById('pathHistory');
+        const pathStepsElement = document.getElementById('pathSteps');
+        const restartBtn = document.getElementById('restartBtn');
+        const backBtn = document.getElementById('backBtn');
+
+        // Function to render a question
+        function renderQuestion(questionId) {
+            // Only add to path history if we're moving forward
+            if (questionId !== 'start' && !pathHistory.some(step => step.id === questionId)) {
+                pathHistory.push({
+                    id: currentQuestion,
+                    text: decisionTree[currentQuestion].question
+                });
+            }
+            
+            currentQuestion = questionId;
+            const questionData = decisionTree[questionId];
+            
+            // Clear previous content
+            decisionTreeElement.innerHTML = '';
+            
+            // Show/hide back button based on whether we're at the start
+            backBtn.style.display = questionId === 'start' ? 'none' : 'inline-block';
+            
+            // Create question element
+            const questionElement = document.createElement('div');
+            questionElement.className = 'question';
+            
+            // If it's a solution, render solution content
+            if (questionData.solution) {
+                questionElement.innerHTML = `
+                    <div class="solution" style="display: block;">
+                        <h3>${questionData.title}</h3>
+                        <ul class="solution-list">
+                            ${questionData.steps.map(step => `<li>${step}</li>`).join('')}
+                        </ul>
+                        ${questionData.warning ? `
+                            <div class="warning-note">
+                                <span class="warning-icon">⚠️</span>
+                                <div>${questionData.warning}</div>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+                
+                // Show restart button
+                restartBtn.style.display = 'block';
+                
+                // Only add solution to history if it's not already there
+                if (!pathHistory.some(step => step.id === questionId)) {
+                    pathHistory.push({
+                        id: questionId,
+                        text: questionData.title,
+                        isSolution: true
+                    });
+                }
+                
+                // Update and show path history
+                updatePathHistory();
+                pathHistoryElement.style.display = 'block';
+            } else {
+                // Render question and options
+                questionElement.innerHTML = `
+                    <h3>${questionData.question}</h3>
+                    <div class="options">
+                        ${questionData.options.map(option => `
+                            <button class="option-btn" data-next="${option.next}">${option.text}</button>
+                        `).join('')}
+                    </div>
+                `;
+                
+                // Add event listeners to option buttons
+                const optionButtons = questionElement.querySelectorAll('.option-btn');
+                optionButtons.forEach(button => {
+                    button.addEventListener('click', function() {
+                        const nextQuestionId = this.getAttribute('data-next');
+                        renderQuestion(nextQuestionId);
+                    });
+                });
+            }
+            
+            decisionTreeElement.appendChild(questionElement);
+            
+            // Always update path history when rendering a question
+            updatePathHistory();
+            pathHistoryElement.style.display = 'block';
+        }
+
+        // Update path history visualization
+        function updatePathHistory() {
+            pathStepsElement.innerHTML = '';
+            
+            // Filter out duplicate entries
+            const uniquePathHistory = pathHistory.filter((step, index, self) =>
+                index === self.findIndex((s) => s.id === step.id)
+            );
+            
+            uniquePathHistory.forEach(step => {
+                const listItem = document.createElement('li');
+                listItem.textContent = step.text;
+                if (step.isSolution) {
+                    listItem.style.fontWeight = 'bold';
+                }
+                pathStepsElement.appendChild(listItem);
+            });
+        }
+
+        // Initialize the decision tree with the first question
+        renderQuestion('start');
+
+        // Add event listener to restart button
+        restartBtn.addEventListener('click', function() {
+            // Clear path history
+            pathHistory.length = 0;
+            
+            // Hide path history element and restart button
+            pathHistoryElement.style.display = 'none';
+            restartBtn.style.display = 'none';
+            
+            // Render the initial question
+            renderQuestion('start');
+            
+            // Scroll to top
+            window.scrollTo(0, 0);
+        });
+
+        // Add event listener to back button
+        backBtn.addEventListener('click', function() {
+            if (pathHistory.length > 0) {
+                // Remove the last step from history
+                const lastStep = pathHistory.pop();
+                
+                // If the last step was a solution, remove the question that led to it
+                if (lastStep.isSolution && pathHistory.length > 0) {
+                    pathHistory.pop();
+                }
+                
+                // Get the previous question ID
+                const previousQuestion = pathHistory.length > 0 ? 
+                    pathHistory[pathHistory.length - 1].id : 'start';
+                
+                // Render the previous question
+                renderQuestion(previousQuestion);
+                
+                // Update path history
+                updatePathHistory();
+                
+                // Scroll to top
+                window.scrollTo(0, 0);
+            }
+        });
+    </script>
+</body>
+</html>
